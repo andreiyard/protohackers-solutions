@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
 )
 
 func main() {
@@ -23,7 +24,8 @@ func main() {
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
-			panic(err)
+			fmt.Fprintln(os.Stderr, "conn accept error:", err)
+			continue
 		}
 		go handleConnection(conn)
 	}
