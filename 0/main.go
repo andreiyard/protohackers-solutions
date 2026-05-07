@@ -32,4 +32,5 @@ func main() {
 func handleConnection(conn net.Conn) {
 	fmt.Println("Conn accepted", conn.RemoteAddr().String())
 	io.Copy(conn, conn)
+	conn.Close()
 }
