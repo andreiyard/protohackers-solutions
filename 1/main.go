@@ -3,13 +3,13 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
+	"log"
 	"net"
 )
 
 type Rqst struct {
-	Method string
-	Number *float64
+	Method string   `json:"method"`
+	Number *float64 `json:"number"`
 }
 
 type Rsp struct {
@@ -26,7 +26,8 @@ func main() {
 	for {
 		conn, err := ls.Accept()
 		if err != nil {
-			println("err when accepting conn", err)
+			log.Println("err when accepting conn", err)
+			continue
 		}
 		go HandleConn(conn)
 	}
@@ -42,15 +43,15 @@ func HandleConn(c net.Conn) {
 	for {
 		data, err := r.ReadBytes('\n')
 		if err != nil {
-			println("err when reading request", err, string(data))
+			log.Println("err when reading request", err, string(data))
 			break
 		}
 
 		rqst := Rqst{}
-		fmt.Printf("rqst: %s", data)
+		log.Printf("rqst: %s", data)
 		err = json.Unmarshal(data, &rqst)
 		if err != nil || rqst.Number == nil || rqst.Method != "isPrime" {
-			fmt.Printf("request is not valid \"%s\" \n", data[:len(data)-1])
+			log.Printf("request is not valid \"%s\" \n", data[:len(data)-1])
 			c.Write([]byte("{}\n"))
 			c.Close()
 			break
@@ -61,7 +62,7 @@ func HandleConn(c net.Conn) {
 
 		rsp := Rsp{rqst.Method, prime}
 		msg, err := json.Marshal(rsp)
-		fmt.Printf("rsp: %s\n", msg)
+		log.Printf("rsp: %s\n", msg)
 		if err != nil {
 			panic(err)
 		}
